@@ -1,0 +1,26 @@
+Adds "quote" links to Metafilter comments.
+
+CHANGELOG:
+
+    23 Feb 2011
+    * Handle new ajax comments - big thanks to pb for setting up the new custom event
+    * Use MeFi's own JQuery object using a content scope injector instead of unsafeWindow (thanks to Rhomboid for some pointers)
+
+    15 Mar 2010
+    * Minor MetaTalk quoting bug fix. Thanks, WCityMike!
+
+    12 Nov 2009
+    * Incorporate Riki tiki's patch for only picking up highlighted text from the right comment.
+
+    29 May 2009
+    * Play nice with Mark Contact Contributions
+
+    12 Mar 2009
+    * Fix for people with "open links in new window" pref
+
+    11 Mar 2009
+    * Convert to jQuery
+    * Fix the URL when quoting the original post
+    * Quote buttons when in non-live preview
+    * Quote only what's highlighted
+
