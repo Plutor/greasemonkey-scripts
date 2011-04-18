@@ -167,7 +167,7 @@ function mst_initComments() {
 function mst_findThreads() {
     var alldivs = document.getElementsByTagName('span');
     for (var i=0; i<alldivs.length; ++i) {
-        if (alldivs[i].className == 'smallcopy' &&
+        if (alldivs[i].className.match(/smallcopy/) &&
             alldivs[i].innerHTML.match(/posted by/)) {
             var metabits = alldivs[i].childNodes;
             // First pass - delete 'mm new' links
