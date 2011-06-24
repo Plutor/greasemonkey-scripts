@@ -146,9 +146,13 @@ function mlc_mark_contribs() {
 
         if (lh.match(userhrefre)) {
             obj = clist.uid[key];
+            if (key == 292)
+                obj = "jessamyn"; // jessamyn is a librarian
         }
         else if (lh.match(usernamehrefre)) {
             obj = clist.name[key];
+            if (key == "jessamyn")
+                obj = "jessamyn"; // jessamyn is a librarian
         }
 
         if (obj) {
