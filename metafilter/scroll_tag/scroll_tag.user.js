@@ -11,13 +11,22 @@
 // to also add the Greasemonkey builtin function emulator script available here:
 //     <http://userjs.org/scripts/browser/enhancements/aa-gm-functions>
 //
-// DONE 2011-03-15
-// * Use cookies that last 10 years instead of everything else
+// DONE 2011-06-28
+// * Content scope injecting
+// * Catch "new comments"
 //
 // TODO
+// * Use jQuery more widely
 // * Mark the last comment if scrolled to the bottom (Opera)
 // * Indicate marked comment(s) for "recent activity" page
 // * Allow mark moving on "recent activity" page
+
+// Content Scope 
+var script = document.createElement('script');
+script.appendChild(document.createTextNode('('+ everything.toString() +')();'));
+script.setAttribute("type", "application/javascript");
+(document.body || document.head || document.documentElement).appendChild(script);
+function everything() {
 
 // ============================================================================
 // Intrepid MeFites who are dissatisfied with the markers and jumpers I have
@@ -59,12 +68,16 @@ function mst_init() {
     if (thread_id) {
         // This is a thread
         mst_initThread();
+
+        // Watch for new comments
+        mst_init_newcomments();
     } else if (mst_isRecentActivity(location.href)) {
         mst_initRecentActivity();
     } else {
         // This is not a thread
         mst_findThreads();
     }
+
 }
 
 //
@@ -86,6 +99,10 @@ function mst_initThread() {
         var y = mst_documentHeight();
         newcomment.addEventListener('focus', function() { mst_findTopComment(y) }, false);
     }
+}
+
+function mst_init_newcomments() {
+    $("#newcomments").bind( 'mefi-comments', mst_initComments );
 }
 
 //
@@ -681,4 +698,7 @@ Cookie = {
 // Start by initializing
 //
 mst_init();
+
+// end of content scope
+}
 
