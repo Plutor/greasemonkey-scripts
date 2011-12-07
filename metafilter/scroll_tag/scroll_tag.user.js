@@ -11,9 +11,8 @@
 // to also add the Greasemonkey builtin function emulator script available here:
 //     <http://userjs.org/scripts/browser/enhancements/aa-gm-functions>
 //
-// DONE 2011-06-28
-// * Content scope injecting
-// * Catch "new comments"
+// DONE 2011-12-07
+// * Compressed cookie storage
 //
 // TODO
 // * Use jQuery more widely
@@ -47,6 +46,9 @@ var jumperconf = {
     maxopacity: 1.0,   // Out of 1.0
     fadeindur: 0.25    // Seconds
 };
+
+var cookie_limit = 4096;   // Maximum cookie size
+
 //
 // ============================================================================
 
@@ -206,12 +208,11 @@ function mst_findThreads() {
                     var total = m[1];
                     var tid = mst_threadUniqName(bit.href);
                     if (tid) {
-                        var markedid = mst_getValue(tid);
-                        var markednum = mst_getValue(tid + "num");
-                        var newc = total - markednum;
-                        if (!markedid || !markednum) {
+                        var marked = mst_getValue(tid);
+                        var newc = total - marked.num;
+                        if (!marked) {
                             newc = total;
-                            markedid = '';
+                            marked.id = '';
                         }
                         if (newc > 0) {
                             // There are new comments
@@ -221,7 +222,7 @@ function mst_findThreads() {
                             newnew.innerHTML = '(<a href="'
                                              + bit.href
                                              + '#'
-                                             + markedid
+                                             + marked.id
                                              + '" target="_self" class="new">'
                                              + newc
                                              + ' new</a>)';
@@ -246,12 +247,12 @@ function mst_findThreads() {
 //
 function mst_loadValue(t) {
     if (!t) t = thread_id;
-    var comment_id = mst_getValue(t);
+    var comment = mst_getValue(t);
 
     // Find the anchor
     var anchors = document.getElementsByTagName('a');
     for (var i=0; i<anchors.length; ++i) {
-        if (anchors[i].name == comment_id) {
+        if (comment && anchors[i].name == comment.id) {
             // Find the comment div after the anchor
             var a = anchors[i];
             while (a && (!a.className || !a.className.match(/comments/) &&
@@ -357,8 +358,7 @@ function mst_mark(c) {
 
     // Save
     if (thread_id && comment_id && comment_num) {
-        mst_setValue(thread_id, comment_id);
-        mst_setValue(thread_id + "num", comment_num);
+        mst_setValue(thread_id, comment_id, comment_num);
     }
 }
 
@@ -604,13 +604,12 @@ function mst_initRecentActivity() {
                     var tid = mst_threadUniqName(bit.href);
                     var url = bit.href.replace(/#\d+$/, '');
                     if (tid) {
-                        var markedid = mst_getValue(tid);
-                        var markednum = mst_getValue(tid + "num");
-                        var newc = total - markednum;
+                        var marked = mst_getValue(tid);
+                        var newc = total - marked.num;
 
-                        if (!markedid || !markednum) {
+                        if (!marked) {
                             newc = total;
-                            markedid = '';
+                            marked.id = '';
                         }
                         if (newc > 0) {
                             // There are new comments
@@ -622,7 +621,7 @@ function mst_initRecentActivity() {
                             
                             var newcount = document.createElement('a');
                             newcount.target = bit.target;
-                            newcount.href = url + '#' + markedid;
+                            newcount.href = url + '#' + marked.id;
                             newcount.innerHTML = 'the last comment you read';
                             newdiv.appendChild( newcount );
 
@@ -643,11 +642,112 @@ function mst_initRecentActivity() {
 // get/set helper functions
 //
 
-function mst_getValue(key) {
-    return Cookie.get("mst_" + key);
+function mst_getValue(thread_id) {
+    var subsite, thread_num;
+    var parts = thread_id.match(/^([^\.]+)\.(\d+)$/);
+    if (parts) {
+        subsite = parts[1];
+        thread_num = parts[2];
+    } else {
+        return
+    }
+
+    // Get the cookie for this subsite
+    var cdata = Cookie.get("mst_" + subsite);
+    var comment_id;
+    var comment_num;
+    if (cdata) {
+        // Find the part for this thread, if it's there
+        var thread_num = mst_toBase64(thread_num, 4);
+        for (var i = 0; i < cdata.length; i += 10) {
+            if (cdata.substr(i, 4) == thread_num) {
+                comment_id = cdata.substr(i+4, 4);
+                comment_num = cdata.substr(i+8, 2);
+                break;
+            }
+        }
+
+        if (comment_id && comment_num) {
+            comment_id = mst_fromBase64(comment_id);
+            comment_num = mst_fromBase64(comment_num);
+        }
+    }
+
+    // Fallback and remove those cookies
+    // We can probably remove this at some point
+    if (!comment_id || !comment_num) {
+        comment_id = Cookie.get("mst_" + thread_id);
+        comment_num = Cookie.get("mst_" + thread_id + "num");
+
+        // Remove the old cookie
+        Cookie.unset("mst_" + thread_id, undefined, "metafilter.com");
+        Cookie.unset("mst_" + thread_id + "num", undefined, "metafilter.com");
+
+        if (comment_id && comment_num) { // Force a save
+            mst_setValue(thread_id, comment_id, comment_num);
+        }
+    }
+
+    return { "id": comment_id, "num": comment_num };
 }
-function mst_setValue(key, value) {
-    Cookie.set("mst_" + key, value, 10*365*24, undefined, "metafilter.com");
+function mst_setValue(thread_id, comment_id, comment_num) {
+    // Separate the subsite and thread_id
+    var subsite, thread_num;
+    var parts = thread_id.match(/^([^\.]+)\.(\d+)$/);
+    if (parts) {
+        subsite = parts[1];
+        thread_num = parts[2];
+    } else {
+        return
+    }
+
+    // uuencode the three parts
+    thread_num = mst_toBase64(thread_num, 4);
+    comment_id = mst_toBase64(comment_id, 4);
+    comment_num = mst_toBase64(comment_num, 2);
+
+    // Get the cookie for this subsite
+    var cdata = Cookie.get("mst_" + subsite);
+
+    if (cdata) {
+        // Remove the part for this thread, if it's there
+        for (var i = 0; i < cdata.length; i += 10) {
+            if (cdata.substr(i, 4) == thread_num) {
+                cdata = cdata.substr(0, i) + cdata.substr(i+10);
+                break;
+            }
+        }
+
+        // Add this thread to the front
+        cdata = thread_num + comment_id + comment_num + cdata;
+    } else {
+        cdata = thread_num + comment_id + comment_num;
+    }
+
+    // Trim
+    if (cdata.length > cookie_limit)
+        cdata = cdata.substr(0, Math.floor(cookie_limit/10)*10);
+
+    Cookie.set("mst_" + subsite, cdata, 10*365*24, undefined, "metafilter.com");
+}
+var base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_/=";
+function mst_toBase64(n, size) {
+    var result = "";
+    for (var i = 0; i < size; ++i) {
+        var digit = n % 64;
+        result = base64chars.charAt(digit) + result;
+        n = (n - digit) / 64; 
+    }
+    return result;
+}
+function mst_fromBase64(n) {
+    var result = 0;
+    for (var i = 0; i < n.length; ++i) {
+        var digit = n.charAt(n.length-i-1); // Get the nth from the last character
+        var dval = base64chars.indexOf(digit) * Math.pow(64, i);
+        result += dval;
+    }
+    return result;
 }
 
 /*****************************************************************************
