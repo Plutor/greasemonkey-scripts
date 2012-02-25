@@ -47,7 +47,7 @@ var jumperconf = {
     fadeindur: 0.25    // Seconds
 };
 
-var cookie_limit = 4096;   // Maximum cookie size
+var cookie_limit = 4096; // Maximum cookie size
 
 //
 // ============================================================================
@@ -725,9 +725,10 @@ function mst_setValue(thread_id, comment_id, comment_num) {
     }
 
     // Trim
-    if (cdata.length > cookie_limit)
+    // The cookie limit includes the cookie name
+    if (cdata.length > cookie_limit - subsite.length - 5) {
         cdata = cdata.substr(0, Math.floor(cookie_limit/10)*10);
-
+    }
     Cookie.set("mst_" + subsite, cdata, 10*365*24, undefined, "metafilter.com");
 }
 var base64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_/=";
