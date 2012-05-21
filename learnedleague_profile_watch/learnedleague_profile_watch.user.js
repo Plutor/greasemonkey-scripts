@@ -13,13 +13,14 @@ var STORAGE_SEP = '::';
 var WATCH_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8%2F9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A%2FwD%2FoL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sDDxAuNep8QrUAAAJCSURBVDjLldJPSyphFMfx7zyjTRYRZlJIMC3sHdiidNOqVSG4DVoFvaJegIu2mY9EUIuCoEUUBhYFuc2iP46O2jzjOM%2FdXAKxC93f%2Fnz4ncMx%2BBvHceTh4SGu6zIxMYFSin6%2Fz%2FLyMisrKxv8IwbAw8ODLJVK5PN5ZmZm0FoTBAFKKarVKo1Gg93dXUzTHIEin5%2Bfcm9vj%2B3tbYIg4Pb2FqUUhmEQj8dJp9NYlsX%2B%2Fv6PDSIHBwdsbm7Sbrd5fHwkk8kQj8cJw5B6vc7LywuJRIL7%2B3s%2BPj5kIpEYahF5fX1ldnaW8%2FNz0uk0nU6HXq%2BH1ppoNMpgMMDzPJaWlri%2Bvh5tMDk5yfv7O0IIXNclCAKEEGit%2Bfr6%2Bl4nFovx9vY2ChiGQb%2FfJxqNEolEGB8fxzRNwjBECIHv%2Bwgh8Dzv5xt4nsfY2BimaX4DlmURhiHdbhfTNBFC0Gw2SaVSI4CYm5vDdV2mpqbwfR%2Bt9fdQEARorfF9n3q9zvz8%2FCiQz%2Bc5PT0lFothGAaO49BqtWg2myilABgMBqyvr1Mul6nVanIImJ6e3tja2uL4%2BBjHcVBK0Wq1aLfbPD8%2FU6vVsCwL27YpFApUKhWq1aoc%2BkSATqcjK5UKT09PQ4%2BUTCZpNBrkcjls28Z1XcrlMmtra2QymQ2DX%2BTo6Eje3d2RzWaxbZter4eUktXVVX4FAJycnMibmxtyuRyLi4t0u12KxeLvAYCzszN5eXlJNptFCMHV1dX%2FAQAXFxeyVCqxsLDAzs4OfwBQqBdST3U8eQAAAABJRU5ErkJggg%3D%3D';
 var WATCHED_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8%2F9hAAAABGdBTUEAAK%2FINwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAMKSURBVHjaYmRAADEeHt4yByenADU1NYWPHz9%2BP3bs2InrV69MBcptYMABAAIIhiyc3b1eHT5x7v%2F9R8%2F%2B33345P%2B12%2Ff%2Fn754%2FX9rz6R%2F%2FAKCC4FqmLFpBAggkKCErZPb4clTpogyMTEzbDh1lWH%2FnWcMFx%2B%2FYmD%2B8Z1BVUmJUUvPSP%2Fg3p2sf%2F%2F82YtuAEAAMXNwcrVMmzXX6fuvPwwzz91n8HQwZ%2FA31WIw1lBkuPL1HwPQNQzyosIM33%2F%2BMrt57fJcoJ4vyAYABBCTgbFZgIKsNMOsk7cYVHQ1GW5%2F%2F8Ow9ekHhh3PPjL85eFhuMkhxPDx2w8GMys7dqB6T3QXAAQQi5qaquyDJy8Y3nLyM9z6%2FIvhNSMzAyszE8Pvf%2F8Z3n%2F7yfDkDyPDo9%2BMDKK8%2FAyMjExy%2F%2F%2F%2FQzEAIAAVc4wDMAgDMNARpATExv8%2F2QEiVRVkxaOHyyLCcsfKQ9fEMMUC%2BPemCnytkKeyXg8AYl8dAcRy7%2B7dB1ycnEqS%2Fz4zCDAxMEixszDwAw358%2B8fw%2FO%2FfxneMfxnEP7%2Fi%2BHu8%2BcM%2F%2F79u4%2FuBYAAYjp98tjad%2B%2FeMehz%2Fmdg%2FPSJgf3XLwYBoDN5gJqZvv9kkP76luHPly8Ml86eANl9D90AgABi%2FvPnz%2FnHjx%2FHOjk68vL8%2BMLw%2B%2Ft3BlagIV%2FfvWdg%2FviWgf3rB4YfP38xuNpbM3749DX43p2bR4H6HsEMAAggUDr49vTxwz13bt%2F2kVdS5eNmYWL48%2F0rw4%2FPnxge3H%2FIcO70aQY1VRUGc2N9BjMLS%2FYXr9%2BF3bl57SRQH9g7AAGEjARYWFjrlDV0zplYO73XNbF6KigivhYo3uQflfJv2YZd%2F6%2FfefD%2FyKmL%2F%2F1Co7%2FBohQggIhCTExMGUBD%2Fi5Zv%2FP%2FdWASP3bm0v%2FgqIQfQCl%2FgABiJsaA%2F%2F%2F%2Fn7l15cLjX%2F%2BYfARFJZiU5KQZDA2NWK5ev%2BELEEDMRDuD4f%2BF29cu3fn%2B%2B78%2Fv7A406ePHxiWLpizCSCAGMgAIdqG5l94%2BQWXA9l8AAEGAAqaMIzpoCLsAAAAAElFTkSuQmCC';
 var THROBBER_URL = 'data:image/gif;base64,R0lGODlhEAAQAPYAAP39%2FfX19enp6f7%2B%2Ftvb2%2Fv7%2B%2FHx8fLy8uXl5d3d3ebm5vj4%2BNHR0aqqqtra2p%2Bfn6WlpePj46GhoampqZubm9%2Ff36CgoJ2dnefn55mZmevr6%2Fn5%2BeTk5Pz8%2FPf397q6urCwsPPz8%2Brq6rS0tOHh4be3t%2B7u7rKysq%2Bvr7u7u%2Bzs7OLi4rOzs62trfDw8O%2Fv7%2Fb29szMzMbGxsnJycTExMXFxcvLy8PDw8fHx8LCwtnZ2e3t7fT09NjY2Pr6%2BtfX19bW1gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH%2FC05FVFNDQVBFMi4wAwEAAAAh%2BQQFAAAaACwAAAAAEAAQAAAFOaAmjmRpnmiqBosqVlCWNUrqyHiGnIWVy5OT4oc7mCJEmcG0oBAlgxODmEgxLrIHwQXACFzgsLgUAgAh%2BQQFAAAAACwDAAMACgAKAAAGMUCAEODZDIeIUquV0gxJy2hLBOiwpMsPQIONBgTdZWiD6o6EhC5nSAAtT6ujUGU6BgEAIfkECQAAAQAsAwADAAoACgAABjHAgDCwKQyHmlkuF3MNBcto7hUAyKRLW8CFjXpe3SWscOvihJyuZsihLWuCo9BwOAYBACH5BAUAAAIALAAAAAAQABAAAAdEgAKCg4SFhoeIiYoFHYqCBwRAQAkBiS6SmECVhgA6mZIJhwGfmD6GPKSSG4YdP6Q6iDukBok7PZI6tIoDATCOv8DBhYEAIfkEBQAAAQAsAwADAAoACgAABjHAgDCwKQyHmlkuF3MNBcto7iWUSZe2gOsa9by4S1jhxsUNAhyuZsihLWuCYwBgOByDACH5BAUAAAAALAMAAwAKAAoAAAYxQIAQ4NkMh4hSq5XSDEnLaEsE6LCkyw9Ag40GBN1laIPqjoSELmdIAC1Pq6NQZToGAQA7';
+var CACHE_VER = '2'; // increment this when new releases make old cache data obsolete
 
 function init() {
     init_header_link();
     init_watchlinks();
 
     var path = location.pathname;
-    if (/^\/profiles\/([^\.\/]*)\.shtml/.exec(path)) {
+    if (get_profilename()) {
         init_profile();
     } else if (path == WATCHLIST_URL) {
         init_watchers();
@@ -31,30 +32,42 @@ function init() {
  */
 function init_watchlinks() {
     var links = document.getElementsByTagName("A");
+    var thisuser = get_profilename();
 
     for (var i=0; i<links.length; ++i) {
         var link = links[i];
+
         // Skip if the link's parent already contains a watch button
         if (link.parentNode.getElementsByClassName('watchbutton').length > 0)
             continue;
 
-        // Skip if the link matches the current URL
-        if (link.href.match(location.pathname))
-            continue;
+        var username = user_from_href(link.href);
 
-        var re = link.href.match(/\/profiles\/([^\.\/]*)\.shtml/);
-        if (re) {
-            var username = re[1];
+        // Skip if the link matches the current URL
+        if (username && username != thisuser) {
             var watchbutton = create_watchbutton(username, 0);
+
             if (link.nextSibling == undefined)
                 link.parentNode.appendChild(watchbutton);
             else
                 link.parentNode.insertBefore(watchbutton, link.nextSibling);
-            
         }
     }
 
     update_watchbuttons();
+}
+
+function user_from_href(href) {
+    var re = href.match(/\/(profiles\/|profiles\.php\?)([^\.\/#]*)(\.shtml)?$/);
+    if (re) {
+        return re[2];
+    } else {
+        return null;
+    }
+}
+
+function get_profilename() {
+    return user_from_href(location.href);
 }
 
 function init_profile() {
@@ -72,7 +85,7 @@ function init_profile() {
 function create_watchbutton(username, hastext) {
     var watchbutton = document.createElement("span");
     watchbutton.className = 'watchbutton';
-    watchbutton.username = username;
+    watchbutton.setAttribute('username', username);
     watchbutton.style.cursor = 'pointer';
 
     if (hastext) {
@@ -92,7 +105,7 @@ function create_watchbutton(username, hastext) {
     // When it's clicked, toggle
     watchbutton.addEventListener('click', function(e) {
         // Change value
-        var username = e.target.username;
+        var username = e.target.getAttribute('username');
         var watched = isWatching(username);
         setWatching(username, !watched);
 
@@ -107,7 +120,7 @@ function update_watchbuttons() {
     // Change button
     var watchbuttons = document.getElementsByClassName('watchbutton');
     for (var i=0; i<watchbuttons.length; ++i) {
-        var username = watchbuttons[i].username;
+        var username = watchbuttons[i].getAttribute('username');
         var watched = isWatching(username);
         if (watchbuttons[i].innerHTML != "&nbsp;")
             watchbuttons[i].innerHTML = watched ? "watched" : "watch";
@@ -122,16 +135,6 @@ function update_watchbuttons() {
             watchbuttons[i].title = 'Watch ' + username;
         }
     }
-}
-
-function get_profilename() {
-    var path = location.pathname;
-
-    var results = (/^\/profiles\/([^\.\/]*)\.shtml/.exec(path));
-    if (results)
-        return results[1];
-
-    return '';
 }
 
 var current_season;
@@ -202,7 +205,7 @@ function init_watchers() {
         var cell = document.createElement("td");
         var profilelink = document.createElement("a");
         profilelink.innerHTML = watched[i];
-        profilelink.href = '/profiles/' + watched[i] + '.shtml';
+        profilelink.href = '/profiles.php?' + watched[i];
         cell.appendChild(profilelink);
         row.appendChild(cell);
 
@@ -247,12 +250,13 @@ function init_watchers() {
 function request_profile(username, row) {
     // Check the cache first
     var content = getCache(username);
-
+    var headercontent = getCache('__HEADER__');
+    
     // Get the content of the table if it wasn't in cache
     if (content == undefined) {
         // XHR non-asynchronous
         var req = new XMLHttpRequest();
-        req.open('GET', '/profiles/' + username + '.shtml', false);
+        req.open('GET', '/profiles/stats.php?' + username, false);
         req.send(null);
 
         if (req.status == 200) {
@@ -260,18 +264,20 @@ function request_profile(username, row) {
             var parser = document.createElement('div');
             parser.innerHTML = req.responseText;
 
-            // Get the container -- the first table in it is this season
-            var divs = parser.getElementsByTagName('DIV');
-            if (divs == undefined || divs.length <= 0) return;
-            for (var i=0; i<divs.length; ++i) {
-                if (divs[i].id == 'profilesdivcontainer') {
-                    var profcont = divs[i];
-                    var proftables = profcont.getElementsByTagName('TABLE');
-                    if (proftables != undefined && proftables.length > 0) {
-                        var seasontable = proftables[0];
-                        content = seasontable.innerHTML;
-                    }
+            var trs = parser.getElementsByTagName('TR');
+            if (trs == undefined || trs.length <= 0) return;
 
+            // The first row is a header
+            if (headercontent == undefined) {
+                headercontent = trs[0].innerHTML;
+                setCache('__HEADER__', headercontent);
+            }
+
+            // Get the first non-header row that doesn't have a className that includes 'total'
+            for (var i=1; i<trs.length; ++i) {
+                if (trs[i].className.indexOf('total') < 0) {
+                    var seasonrow = trs[i];
+                    content = seasonrow.innerHTML;
                     setCache(username, content);
 
                     parser.innerHTML = "";
@@ -281,26 +287,25 @@ function request_profile(username, row) {
         }
     }
 
-    // Now parse the content of the table
+    // Now parse the content of the row
     if (content != undefined) {
-        var seasontable = document.createElement('table');
-        seasontable.innerHTML = content;
+        var seasonrow = document.createElement('tr');
+        seasonrow.innerHTML = content;
 
         // Make sure the player is playing this season
         var currseason = get_current_season();
-        if (seasontable.rows[0].cells[0].innerHTML != currseason) {
+        if (seasonrow.cells[0].innerHTML != currseason) {
             var throbbercell = row.childNodes[1];
             throbbercell.innerHTML = "<small>Inactive</small>";
             return;
         }
 
-        var seasonrow = seasontable.rows[1];
         update_profile(row, seasonrow);
 
         // Also update the header if we haven't yet
-        if (!row.parentNode.hasHeaders) {
-            var headerrow = seasontable.rows[0];
-            update_profile(row.parentNode.parentNode.rows[0], headerrow);
+        if (!row.parentNode.hasHeaders && headercontent) {
+            seasonrow.innerHTML = headercontent;
+            update_profile(row.parentNode.parentNode.rows[0], seasonrow);
             row.parentNode.hasHeaders = 1;
         }
     } else {
@@ -317,9 +322,14 @@ function update_profile(row, seasonrow) {
         row.removeChild(row.childNodes[1]);
     }
 
-    // Move all of the cells over
-    while (seasonrow.cells.length > 0) {
-        var c = seasonrow.cells[0];
+    // Move the last cell over first
+    var c = seasonrow.cells[seasonrow.cells.length - 1];
+    c.parentNode.removeChild(c);
+    row.appendChild(c);
+
+    // Then move all of the rest of the cells over (starting with the second one)
+    while (seasonrow.cells.length > 1) {
+        var c = seasonrow.cells[1];
         c.parentNode.removeChild(c);
         row.appendChild(c);
     }
@@ -394,10 +404,10 @@ function getAllWatched() {
 }
 
 function getCache(username) {
-    var expires = localStorage.getItem("pw_cache_expires_" + username);
+    var expires = localStorage.getItem("pw_cache_expires_" + CACHE_VER + "_" + username);
     now = new Date();
     if (now.getTime() < expires)
-        return localStorage.getItem("pw_cache_" + username);
+        return localStorage.getItem("pw_cache_" + CACHE_VER + "_" + username);
     else
         return undefined
 }
@@ -406,8 +416,8 @@ function setCache(username, value) {
     // Cache for six hours
     expires = new Date();
     expires.setTime(expires.getTime() + (6 * 60 * 60 * 1000));
-    localStorage.setItem("pw_cache_expires_" + username, expires.getTime());
-    localStorage.setItem("pw_cache_" + username, value);
+    localStorage.setItem("pw_cache_expires_" + CACHE_VER + "_" + username, expires.getTime());
+    localStorage.setItem("pw_cache_" + CACHE_VER + "_" + username, value);
 }
 
 init();
